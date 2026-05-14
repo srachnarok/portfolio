@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sara Chini</title>
+<link rel="icon" type="image/x-icon" href="./assets/Sara_Chini (1).ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Suisse+Int%27l+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #000;
+    --fg: #fff;
+    --fg-muted: rgba(255,255,255,0.62);
+    --line: rgba(255,255,255,0.16);
+    --open-bar: #6f2cff;
+    --mouse-x: 50vw;
+    --mouse-y: 50vh;
+    --row-h: clamp(44px, 6vh, 60px);
+    --bar-h: clamp(240px, 44vh, 400px);
+    --font-display: Arial, Helvetica, sans-serif;
+    --font-mono: Arial, Helvetica, sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    left: var(--mouse-x);
+    top: var(--mouse-y);
+    width: clamp(50px, 42vw, 2050px);
+    height: clamp(50px, 30vw, 2050px);
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse, rgba(160, 44, 255, 0.052) 0%, rgba(111, 44, 255, 0.035) 38%, rgba(111,44,255,0) 72%);
+    pointer-events: none;
+    z-index: 0;
+    transition: left 0.22s ease-out, top 0.22s ease-out;
+  }
+
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(2rem, 5vh, 4rem) 1.5rem clamp(1.2rem, 3vh, 2.2rem);
+    border-bottom: 0.5px solid var(--line);
+  }
+
+  .lang-toggle {
+    position: absolute;
+    top: clamp(1rem, 3vh, 1.6rem);
+    left: clamp(1rem, 4vw, 2.5rem);
+    font-family: var(--font-mono);
+    font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: var(--fg-muted);
+    cursor: pointer;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .lang-toggle:hover {
+    color: var(--fg);
+    border-bottom-color: var(--fg);
+  }
+
+  .about-toggle {
+    position: absolute;
+    top: clamp(1rem, 3vh, 1.6rem);
+    right: clamp(1rem, 4vw, 2.5rem);
+    font-family: var(--font-mono);
+    font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: var(--fg-muted);
+    cursor: pointer;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .about-toggle:hover {
+    color: var(--fg);
+    border-bottom-color: var(--fg);
+  }
+
+  .name {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.6rem, 5vw, 3rem);
+    line-height: 1;
+    margin-bottom: clamp(0.9rem, 2.5vh, 1.6rem);
+  }
+
+  nav {
+    display: flex;
+    gap: clamp(1.5rem, 6vw, 4rem);
+  }
+
+  nav button {
+    font-family: var(--font-mono);
+    font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: var(--fg-muted);
+    cursor: pointer;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+  }
+
+  nav button.active, nav button:hover {
+    color: var(--fg);
+    border-bottom-color: var(--fg);
+  }
+
+  /* ── LIST AREA ── */
+  main {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .section { 
+    display: none; 
+    flex-direction: column;
+    min-height: 100%;
+  }
+  .section.visible { display: flex; }
+
+  /* ── ROW ── */
+  .item-row {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Il margin-top auto sul primo elemento allinea tutto al bottom */
+  .item-row:first-child { margin-top: auto; }
+
+  .item-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    height: var(--row-h);
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+    background-position: center;
+    background-size: cover;
+    transition: background 0.15s;
+  }
+
+  .item-row:hover .item-header {
+    background-image: linear-gradient(rgba(0,0,0,0.28), rgba(0,0,0,0.28)), var(--gallery-cover);
+  }
+
+  .item-row.open .item-header,
+  .item-row.open:hover .item-header {
+    background: #151515;
+  }
+
+  .item-meta {
+    font-family: var(--font-mono);
+    font-size: clamp(0.6rem, 1.3vw, 0.72rem);
+    color: var(--fg-muted);
+    letter-spacing: 0.05em;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .item-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.15rem, 3vw, 1.7rem);
+    text-align: left;
+    text-transform: uppercase;
+    line-height: 1;
+    min-width: 0;
+  }
+
+  .item-gallery {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .item-row.open .item-gallery {
+    max-height: calc(var(--bar-h) + 1px);
+  }
+
+  .gallery-scroll {
+    display: flex;
+    gap: 6px;
+    padding: 8px clamp(1rem, 4vw, 2.5rem);
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: var(--bar-h);
+    align-items: center;
+    scrollbar-width: none;
+  }
+
+  .gallery-scroll::-webkit-scrollbar { display: none; }
+
+  .img-placeholder {
+    height: calc(var(--bar-h) - 16px);
+    width: clamp(80px, 15vw, 180px);
+    flex-shrink: 0;
+    background: var(--c, #d0cdc6);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .project-description {
+    height: calc(var(--bar-h) - 16px);
+    width: clamp(220px, 28vw, 360px);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1rem;
+   /* border: 1px solid var(--line);
+    border-radius: 2px;  */
+    font-family: var(--font-display);
+    font-size: clamp(0.82rem, 1.4vw, 1rem);
+    line-height: 1.35;
+    color: var(--fg);
+    overflow: auto;
+  }
+
+  .project-collaborators {
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+    line-height: 1.4;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+a:visited {
+    color: var(--fg);
+}
+  
+a {
+      text-decoration: none;
+}
+
+  .gallery-scroll img {
+    --gallery-media-h: calc(var(--bar-h) - 16px);
+    height: var(--gallery-media-h);
+    max-height: var(--gallery-media-h);
+    width: auto;
+    max-width: none;
+    flex-shrink: 0;
+    object-fit: contain;
+    border-radius: 2px;
+    background: #111;
+  }
+
+.gallery-scroll video {
+    --gallery-media-h: calc(var(--bar-h) - 16px);
+    height: var(--gallery-media-h);
+    max-height: var(--gallery-media-h);
+    width: auto;
+    max-width: none;
+    flex-shrink: 0;
+    object-fit: contain;
+    border-radius: 2px;
+    background: #111;
+  }
+
+  a:visited {
+    color:none;
+  }
+
+  .about-popover {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: clamp(3.8rem, 9vh, 5.5rem) clamp(1rem, 4vw, 2.5rem) 1rem;
+    background: rgba(0,0,0,0.18);
+    z-index: 10;
+  }
+
+  .about-popover.open {
+    display: flex;
+  }
+
+  .about-panel {
+    width: min(100%, 300px);
+    padding: 1rem;
+    background: #111;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.36);
+  }
+
+  .about-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .about-panel-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .about-close {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    line-height: 1;
+    background: none;
+    border: none;
+    color: var(--fg-muted);
+    cursor: pointer;
+    padding: 0.2rem;
+  }
+
+  .about-close:hover {
+    color: var(--fg);
+  }
+
+  .about-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .about-links a {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
+    line-height: 1.1;
+    color: var(--fg);
+  }
+
+  .about-links a:hover {
+    color: var(--fg-muted);
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <button class="lang-toggle" type="button" aria-label="Switch language">EN</button>
+  <button class="about-toggle" type="button" aria-expanded="false" aria-controls="about-popover" data-i18n="aboutToggle">About</button>
+  <h1 class="name">Sara Chini</h1>
+  <nav>
+    <button class="active" data-section="progetti" data-i18n="navProjects">Progetti</button>
+    <button data-section="fotografie" data-i18n="navPhotography">Fotografie</button>
+  </nav>
+</header>
+
+<div class="about-popover" id="about-popover" aria-hidden="true">
+  <div class="about-panel" role="dialog" aria-modal="true" aria-labelledby="about-title">
+    <div class="about-panel-header">
+      <p class="about-panel-title" id="about-title" data-i18n="aboutTitle">About</p>
+      <button class="about-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="about-links">
+      <a href="mailto:sarachini02@gmail.com">sarachini02@gmail.com</a>
+      <a href="./assets/Sara_Chini_CV2026.pdf" target="_blank" rel="noopener" data-i18n="cvLink">CV</a>
+      <a href="https://www.linkedin.com/in/sara-chini-4749a721a/" target="_blank" rel="noopener" data-i18n="linkedinLink">LinkedIn</a>
+      <a href="https://www.instagram.com/fotoprecompresse/" target="_blank" rel="noopener" data-i18n="instagramLink">Instagram</a>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- PROGETTI -->
+  <div class="section visible" id="progetti">
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">Sodamore</span><span class="item-meta">Social Media, 2026</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="sodamoreDescription">Sodamore è la prima linea orizzontale di bevande analcoliche, che promuove un messaggio di amore di fronte al desiderio di costruire una nuova idea di socialità, in cui la scelta analcolica non sia una rinuncia, ma una possibilità in più.<p class="project-collaborators">tirocinio curricolare</p></div>
+          <img src="./assets/sodamore/sodamore-caroselli.gif" alt="Sodamore placeholder 2">
+          <video src="./assets/sodamore/sodamore-video.mp4" alt="Sodamore placeholder 3" autoplay loop muted></video>
+          <video src="./assets/sodamore/sodamore-mappa.mp4" alt="Sodamore placeholder 3" autoplay loop muted></video>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">Dumo</span><span class="item-meta">Interaction design, 2025</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="dumoDescription">Dumo è un progetto di design speculativo che trae ispirazione dal funzionamento stesso del mondo fungino, in particolare dal modo in cui opera la rete miceliale: essa funge da mediatore e da collegamento tra diverse piante. Dumo è un dispositivo domestico a forma di fungo che favorisce la comunicazione e l'interconnessione tra l'uomo e la natura, consentendo a entrambi di scambiarsi segnali e messaggi attraverso un linguaggio mediato e condiviso.<p class="project-collaborators">Con: Sara Balestrini, Asia Capezzuoli, Sonia Cattaneo, Letizia Luraghi, Elena Pegoretti, Anna Pustizzi </p></div>
+          <img src="./assets/Dumo/Dumo_1.webp" alt="Dumo placeholder 2">
+          <video src="./assets/Dumo/dumo-video.mp4" alt="Dumo placeholder 3" autoplay loop muted></video>
+          <img src="./assets/Dumo/Dumo_3.webp" alt="Dumo placeholder 4">
+          <img src="./assets/Dumo/Dumo_4.webp" alt="Dumo placeholder 5">
+          <img src="./assets/Dumo/Dumo_5.webp" alt="Dumo placeholder 6">
+        </div>
+      </div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">IDgramma</span><span class="item-meta">Exhibition design, 2025</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="idgrammaDescription">Questa installazione virtuale presenta scansioni 3D di volti, volutamente manipolate, per mettere in discussione le percezioni dell'identità e della rappresentazione digitale, trando ispirazione dalla glitch art.
+Per garantire l'accessibilità a chi non dispone di un visore VR, la mostra è stata progettata anche come un gioco, consentendo agli utenti di simulare l'esperienza virtuale direttamente da un computer.<p class="project-collaborators">Con: Sonia Cattaneo, Giovanni Coroneo, Letizia Luraghi, Lorenzo Sicignano</p></div>
+          <video src="./assets/IDgramma/IDgramma-vid2.mp4" alt="IDgramma placeholder 2" autoplay loop muted></video>
+          <img src="./assets/IDgramma/IDgramma_5.webp" alt="IDgramma placeholder 4">
+          <img src="./assets/IDgramma/IDgramma_3.webp" alt="IDgramma placeholder 4">
+          <video src="./assets/IDgramma/IDgramma-play1.mp4" alt="IDgramma placeholder 4" autoplay loop muted></video>
+          <img src="./assets/IDgramma/IDgramma_2.webp" alt="IDgramma placeholder 4">
+        </div>
+      </div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">Avocartel</span><span class="item-meta" data-i18n="speculativeDesign">Design speculativo, 2024</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="avocartelDescription">Avocartel è un progetto di design speculativo che immagina un futuro dove la criminalità organizzata controlla interamente il mercato di avocado. In questo scenario, il progetto rende visibile il costo sociale deitro la produzione del frutto, traducendo i dati economici in violenza, sfruttamento e vite umane tramite la bilancia Libre.<p class="project-collaborators">Con: Arianna Albertini, Elisa Bruschi, Sonia Cattaneo, Letizia Luraghi, Rachele Tarateo</p></div>
+          <img src="./assets/avocartel/avocartel-3.jpg" alt="Avocartel 3">
+          <img src="./assets/avocartel/avocartel-7.jpg" alt="Avocartel 2">
+          <video src="./assets/avocartel/avocartel_teaser.mp4" alt="Avocartel teaser" autoplay loop muted>
+          <img src="./assets/avocartel/avocartel-1.webp" alt="Avocartel 1">
+        </div>
+      </div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">L'invito</span><span class="item-meta" data-i18n="shortFilm">Cortometraggio, 2024</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="invitoDescription">L'invito racconta di un rapporto disfunzionale tra una madre, conduttrice televisiva di un programma di cucina impegnata quotidianamente nel suo lavoro, e una figlia adolescente, che cerca costantemente le attenzioni della figura materna. Tra le due sembra unirle soltanto un piatto, una tradizione familiare, la cui preparazione, da parte della figlia in occasione della cena con la madre, diventa l'unico modo che lei ha per ottenere le attenzioni che vorrebbe.<p class="project-collaborators">Con: Elisa Cavallo, Andrea Damascelli, Sharlotte Garcia, Alice Muratore, Gabriele Piacenza, Grecia Via Y Rada, Sieun Kweon</p></div>
+          <img src="./assets/linvito/linvito-2.png" alt="L'invito 2">
+          <img src="./assets/linvito/linvito-1.webp" alt="L'invito">
+          <img src="./assets/linvito/linvito_gif.gif" alt="L'invito gif">
+          <img src="./assets/linvito/linvito-backstage1.jpg" alt="L'invito backstage">
+          <img src="./assets/linvito/linvito-color.jpg" alt="L'invito color correction">
+        </div>
+      </div>
+    </div>
+  </div><!-- /progetti -->
+
+  <!-- FOTOGRAFIE -->
+  <div class="section" id="fotografie">
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">Streets of Riga</span><span class="item-meta">Street Photography, 2024</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="rigaDescription">Questa raccolta di fotografie racconta la mia esperienza come studentessa internazionale a Riga.</div>
+          <img src="./assets/foto/Streets of Riga/riga-27.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-29.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-30.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-49.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-51.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-52.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-64.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-65.jpg" alt="Streets of Riga placeholder 2">
+          <img src="./assets/foto/Streets of Riga/riga-82.jpg" alt="Streets of Riga placeholder 2">
+        </div>
+      </div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">IN ECCESSO</span><span class="item-meta" data-i18n="fashion">Moda, 2025</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="ineccessoDescription">IN ECCESSO è una collezione autunno/inverno che esplora il contrasto tra l'uniforme borghese e la vulnerabilità dell'identità maschile contemporanea. <p class="project-collaborators">Costume design: Gaia Francesca Iacoviello</p></div>
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (1).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (2).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (3).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (4).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (5).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (6).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (7).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (8).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (9).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (10).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (11).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (12).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (13).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (14).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (15).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (16).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (17).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (18).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (19).jpg" alt="IN ECCESSO placeholder 2">
+          <img src="./assets/foto/IN ECCESSO/INECCESSO (20).jpg" alt="IN ECCESSO placeholder 2">
+
+        </div>
+      </div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-header">
+        <span class="item-title">Fuorisalone 2023&2025</span><span class="item-meta" data-i18n="events">Eventi, 2023/2025</span>
+      </div>
+      <div class="item-gallery">
+        <div class="gallery-scroll">
+          <div class="project-description" data-i18n="fuorisaloneDescription">Come e.reporter per Fuorisalone.it, ho documentato gli eventi e le attività della Design Week cercando di catturare l'essenza di ogni esibizione. Foto in mostra sul sito ufficiale Fuorisalone.it.<p class="project-collaborators"></p></div>
+          <img src="./assets/foto/fuorisalone/fuorisalone (1).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (2).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (3).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (4).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (5).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (6).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (7).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (8).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (9).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (10).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (11).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (12).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (13).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+          <img src="./assets/foto/fuorisalone/fuorisalone (14).jpg" alt="Fuorisalone 2023&2025 placeholder 2">
+        </div>
+      </div>
+    </div>
+  </div><!-- /fotografie -->
+
+</main>
+
+<script>
+  const translations = {
+    it: {
+      navProjects: 'Progetti',
+      navPhotography: 'Fotografie',
+      aboutToggle: 'About',
+      aboutTitle: 'About',
+      cvLink: 'CV',
+      linkedinLink: 'LinkedIn',
+      instagramLink: 'Instagram',
+      speculativeDesign: 'Design speculativo, 2024',
+      shortFilm: 'Cortometraggio, 2024',
+      fashion: 'Moda, 2025',
+      events: 'Eventi, 2023/2025',
+      sodamoreDescription: 'Sodamore è la prima linea orizzontale di bevande analcoliche, che promuove un messaggio di amore di fronte al desiderio di costruire una nuova idea di socialità, in cui la scelta analcolica non sia una rinuncia, ma una possibilità in più.<p class="project-collaborators">tirocinio curricolare</p>',
+      dumoDescription: 'Dumo è un progetto di design speculativo che trae ispirazione dal funzionamento stesso del mondo fungino, in particolare dal modo in cui opera la rete miceliale: essa funge da mediatore e da collegamento tra diverse piante. Dumo è un dispositivo domestico a forma di fungo che favorisce la comunicazione e l\'interconnessione tra l\'uomo e la natura, consentendo a entrambi di scambiarsi segnali e messaggi attraverso un linguaggio mediato e condiviso.<p class="project-collaborators">Con: Sara Balestrini, Asia Capezzuoli, Sonia Cattaneo, Letizia Luraghi, Elena Pegoretti, Anna Pustizzi</p>',
+      idgrammaDescription: 'Questa installazione virtuale presenta scansioni 3D di volti, volutamente manipolate, per mettere in discussione le percezioni dell\'identità e della rappresentazione digitale, trando ispirazione dalla glitch art. Per garantire l\'accessibilità a chi non dispone di un visore VR, la mostra è stata progettata anche come un gioco, consentendo agli utenti di simulare l\'esperienza virtuale direttamente da un computer.<p class="project-collaborators">Con: Sonia Cattaneo, Giovanni Coroneo, Letizia Luraghi, Lorenzo Sicignano</p>',
+      avocartelDescription: 'Avocartel è un progetto di design speculativo che immagina un futuro dove la criminalità organizzata controlla interamente il mercato di avocado. In questo scenario, il progetto rende visibile il costo sociale deitro la produzione del frutto, traducendo i dati economici in violenza, sfruttamento e vite umane tramite la bilancia Libre.<p class="project-collaborators">Con: Arianna Albertini, Elisa Bruschi, Sonia Cattaneo, Letizia Luraghi, Rachele Tarateo</p>',
+      invitoDescription: 'L\'invito racconta di un rapporto disfunzionale tra una madre, conduttrice televisiva di un programma di cucina impegnata quotidianamente nel suo lavoro, e una figlia adolescente, che cerca costantemente le attenzioni della figura materna. Tra le due sembra unirle soltanto un piatto, una tradizione familiare, la cui preparazione, da parte della figlia in occasione della cena con la madre, diventa l\'unico modo che lei ha per ottenere le attenzioni che vorrebbe.<p class="project-collaborators">Con: Elisa Cavallo, Andrea Damascelli, Sharlotte Garcia, Alice Muratore, Gabriele Piacenza, Grecia Via Y Rada, Sieun Kweon</p>',
+      rigaDescription: 'Questa raccolta di fotografie racconta la mia esperienza come studentessa internazionale a Riga.',
+      ineccessoDescription: 'IN ECCESSO è una collezione autunno/inverno che esplora il contrasto tra l\'uniforme borghese e la vulnerabilità dell\'identità maschile contemporanea. <p class="project-collaborators">Costume design: Gaia Francesca Iacoviello</p>',
+      fuorisaloneDescription: 'Come e.reporter per Fuorisalone.it, ho documentato gli eventi e le attività della Design Week cercando di catturare l\'essenza di ogni esibizione. Foto in mostra sul sito ufficiale Fuorisalone.it.<p class="project-collaborators"><a href="https://www.fuorisalone.it/it/ereporter/11043/Sara-Chini">Profilo intero</a></p>'
+    },
+    en: {
+      navProjects: 'Projects',
+      navPhotography: 'Photography',
+      aboutToggle: 'About',
+      aboutTitle: 'About',
+      cvLink: 'CV',
+      linkedinLink: 'LinkedIn',
+      instagramLink: 'Instagram',
+      speculativeDesign: 'Speculative design, 2024',
+      shortFilm: 'Short film, 2024',
+      fashion: 'Fashion, 2025',
+      events: 'Events, 2023/2025',
+      sodamoreDescription: 'Sodamore is the first horizontal line of non-alcoholic drinks, promoting a message of love and the desire to build a new idea of sociality, where choosing alcohol-free is not a renunciation, but one more possibility.<p class="project-collaborators">curricular internship</p>',
+      dumoDescription: 'Dumo is a speculative design project inspired by the way the fungal world works, especially the mycelial network: a mediator and connector between different plants. Dumo is a mushroom-shaped domestic device that encourages communication and interconnection between humans and nature, allowing both to exchange signals and messages through a shared mediated language.<p class="project-collaborators">With: Sara Balestrini, Asia Capezzuoli, Sonia Cattaneo, Letizia Luraghi, Elena Pegoretti, Anna Pustizzi</p>',
+      idgrammaDescription: 'This virtual installation presents 3D scans of faces, deliberately manipulated to question perceptions of identity and digital representation, drawing inspiration from glitch art. To make the exhibition accessible to people without a VR headset, it was also designed as a game, allowing users to simulate the virtual experience directly from a computer.<p class="project-collaborators">With: Sonia Cattaneo, Giovanni Coroneo, Letizia Luraghi, Lorenzo Sicignano</p>',
+      avocartelDescription: 'Avocartel is a speculative design project that imagines a future where organized crime fully controls the avocado market. In this scenario, the project makes the social cost behind the fruit\'s production visible, translating economic data into violence, exploitation and human lives through the Libre scale.<p class="project-collaborators">With: Arianna Albertini, Elisa Bruschi, Sonia Cattaneo, Letizia Luraghi, Rachele Tarateo</p>',
+      invitoDescription: 'L\'invito tells the story of a dysfunctional relationship between a mother, a television host of a cooking show who is constantly absorbed by her work, and her teenage daughter, who is always seeking her mother\'s attention. The only thing that seems to connect them is a dish, a family tradition, whose preparation by the daughter for dinner with her mother becomes the only way she has to receive the attention she longs for.<p class="project-collaborators">With: Elisa Cavallo, Andrea Damascelli, Sharlotte Garcia, Alice Muratore, Gabriele Piacenza, Grecia Via Y Rada, Sieun Kweon</p>',
+      rigaDescription: 'This photo series tells the story of my experience as an international student in Riga.',
+      ineccessoDescription: 'IN ECCESSO is an autumn/winter collection that explores the contrast between the bourgeois uniform and the vulnerability of contemporary male identity. <p class="project-collaborators">Costume design: Gaia Francesca Iacoviello</p>',
+      fuorisaloneDescription: 'As an e.reporter for Fuorisalone.it, I documented Design Week events and activities, trying to capture the essence of each exhibition. Photos are showcased on the official Fuorisalone.it website.<p class="project-collaborators"><a href="https://www.fuorisalone.it/it/ereporter/11043/Sara-Chini">Full profile</a></p>'
+    }
+  };
+
+  const langToggle = document.querySelector('.lang-toggle');
+  const aboutToggle = document.querySelector('.about-toggle');
+  const aboutPopover = document.querySelector('.about-popover');
+  const aboutClose = document.querySelector('.about-close');
+  const navBtns = document.querySelectorAll('nav button');
+  const sections = document.querySelectorAll('.section');
+  let activeRow = null;
+  let currentLang = 'it';
+
+  function applyLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    langToggle.textContent = lang === 'it' ? 'EN' : 'IT';
+    langToggle.setAttribute('aria-label', lang === 'it' ? 'Switch to English' : 'Passa all\'italiano');
+
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+      const value = translations[lang][element.dataset.i18n];
+      if (value) element.innerHTML = value;
+    });
+  }
+
+  langToggle.addEventListener('click', () => {
+    applyLanguage(currentLang === 'it' ? 'en' : 'it');
+  });
+
+  function setAboutOpen(isOpen) {
+    aboutPopover.classList.toggle('open', isOpen);
+    aboutPopover.setAttribute('aria-hidden', String(!isOpen));
+    aboutToggle.setAttribute('aria-expanded', String(isOpen));
+  }
+
+  aboutToggle.addEventListener('click', () => {
+    setAboutOpen(!aboutPopover.classList.contains('open'));
+  });
+
+  aboutClose.addEventListener('click', () => {
+    setAboutOpen(false);
+  });
+
+  aboutPopover.addEventListener('click', event => {
+    if (event.target === aboutPopover) setAboutOpen(false);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') setAboutOpen(false);
+  });
+
+  window.addEventListener('mousemove', event => {
+    document.documentElement.style.setProperty('--mouse-x', `${event.clientX}px`);
+    document.documentElement.style.setProperty('--mouse-y', `${event.clientY}px`);
+  });
+
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      navBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const target = btn.dataset.section;
+      sections.forEach(s => {
+        s.classList.toggle('visible', s.id === target);
+      });
+
+      if (activeRow) {
+        activeRow.classList.remove('open');
+        activeRow = null;
+      }
+    });
+  });
+
+  document.querySelectorAll('.item-row').forEach(row => {
+    const cover = row.querySelector('.gallery-scroll img');
+
+    if (cover) {
+      row.style.setProperty('--gallery-cover', `url("${cover.currentSrc || cover.src}")`);
+    }
+
+    row.querySelector('.item-header').addEventListener('click', () => {
+      if (row.classList.contains('open')) {
+        row.classList.remove('open');
+        activeRow = null;
+        return;
+      }
+      if (activeRow) activeRow.classList.remove('open');
+      row.classList.add('open');
+      activeRow = row;
+    });
+  });
+
+  document.querySelectorAll('.gallery-scroll').forEach(gallery => {
+    gallery.addEventListener('wheel', event => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+      event.preventDefault();
+      gallery.scrollLeft += event.deltaY;
+    }, { passive: false });
+  });
+</script>
+
+</body>
+</html>
